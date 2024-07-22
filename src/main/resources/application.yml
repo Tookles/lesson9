@@ -4,8 +4,8 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/lesson9
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: library
-    password: library
+    username: lesson9
+    password: lesson9
   jpa:
     hibernate:
       naming:
