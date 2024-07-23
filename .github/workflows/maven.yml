@@ -25,8 +25,12 @@ jobs:
     - name: Add sample data to MySQL database
       run: mysql --user=root --password=root --host 127.0.0.1 < src/main/resources/sample-data.sql
     - name: Create MySQL admin user to access database
-      run: mysql --user=root --password=root --host 127.0.0.1 < src/main/resources/admin-user.sql
-    - name: Build with Maven
+      env:
+        LESSON9_USER: ${{ secrets.LESSON9_USER }}
+        LESSON9_PASSWORD: ${{ secrets.LESSON9_PASSWORD }}
+      run: mysql --user=root --password=root --host 127.0.0.1 <<< "CREATE USER '$LESSON9_USER'@'localhost' IDENTIFIED BY '$LESSON9_PASSWORD'; GRANT ALL PRIVILEGES ON lesson9.* TO '$LESSON9_USER'@'localhost';"
+    - name: Build and test with Maven
+      env:
+        LESSON9_USER: ${{ secrets.LESSON9_USER }}
+        LESSON9_PASSWORD: ${{ secrets.LESSON9_PASSWORD }}
       run: mvn -B package
-    - name: Test with Maven
-      run: mvn -B test
