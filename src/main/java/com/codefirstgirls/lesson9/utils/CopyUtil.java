@@ -28,6 +28,6 @@ public class CopyUtil {
                 .filter(copy -> copy.getLoans()
                         .stream()
                         .allMatch(loan -> loan.getStatus() == LoanStatus.COMPLETED))
-                .max(Comparator.comparing(Copy::getCondition));
+                .min(Comparator.comparing(Copy::getCondition));
     }
 }
