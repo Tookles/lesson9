@@ -29,8 +29,27 @@ jobs:
         LESSON9_USER: ${{ secrets.LESSON9_USER }}
         LESSON9_PASSWORD: ${{ secrets.LESSON9_PASSWORD }}
       run: mysql --user=root --password=root --host 127.0.0.1 <<< "CREATE USER '$LESSON9_USER'@'localhost' IDENTIFIED BY '$LESSON9_PASSWORD'; GRANT ALL PRIVILEGES ON lesson9.* TO '$LESSON9_USER'@'localhost';"
-    - name: Build and test with Maven
+    - name: Build with Maven
       env:
         LESSON9_USER: ${{ secrets.LESSON9_USER }}
         LESSON9_PASSWORD: ${{ secrets.LESSON9_PASSWORD }}
-      run: mvn -B package
+      run: mvn -B package -D maven.test.skip
+    - name: Test with Maven
+      env:
+        LESSON9_USER: ${{ secrets.LESSON9_USER }}
+        LESSON9_PASSWORD: ${{ secrets.LESSON9_PASSWORD }}
+      run: mvn -B test
+    - name: Run with Docker
+      env:
+        MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+        LESSON9_USER: ${{ secrets.LESSON9_USER }}
+        LESSON9_PASSWORD: ${{ secrets.LESSON9_PASSWORD }}
+      run: docker compose up --build --detach
+    - name: Check container health
+      run: |
+        for i in 1 2 3 4 5
+        do
+          sleep 10
+          docker compose ps --format "{{ .Service }} {{ .Status }}" | grep "^lesson9.*(healthy)$" && EXIT_CODE=0 && break || EXIT_CODE=1
+        done
+        (exit $EXIT_CODE)
