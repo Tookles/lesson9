@@ -1,0 +1,37 @@
+version: "3.9"
+
+services:
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${LESSON9_USER}
+      MYSQL_PASSWORD: ${LESSON9_PASSWORD}
+      MYSQL_DATABASE: lesson9
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./src/main/resources:/docker-entrypoint-initdb.d:x
+    healthcheck:
+      test: mysql --user="${LESSON9_USER}" --password="${LESSON9_PASSWORD}" --silent --execute "USE lesson9;"
+      interval: 10s
+      timeout: 10s
+      retries: 5
+  lesson9:
+    build:
+      context: .
+      target: run
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      MYSQL_HOST: mysql
+      LESSON9_USER: ${LESSON9_USER}
+      LESSON9_PASSWORD: ${LESSON9_PASSWORD}
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: curl --fail http://localhost:8080/books
+      interval: 10s
+      timeout: 10s
+      retries: 5

@@ -2,11 +2,16 @@ spring:
   application:
     name: lesson9
   datasource:
-    url: jdbc:mysql://localhost:3306/lesson9
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:3306/lesson9
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${LESSON9_USER}
-    password: ${LESSON9_PASSWORD}
+    username: ${LESSON9_USER:lesson9}
+    password: ${LESSON9_PASSWORD:lesson9}
   jpa:
     hibernate:
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    properties:
+      hibernate:
+        temp:
+          use_jdbc_metadata_defaults: false
+        dialect: org.hibernate.dialect.MySQLDialect
