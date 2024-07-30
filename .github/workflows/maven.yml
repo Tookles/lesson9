@@ -21,29 +21,29 @@ jobs:
     - name: Start MySQL
       run: sudo systemctl start mysql
     - name: Set up MySQL database
-      run: mysql --user=root --password=root --host 127.0.0.1 < src/main/resources/database.sql
+      run: mysql --user=root --password=${{ secrets.MY_SQL_PASSWORD }} --host 127.0.0.1 < src/main/resources/database.sql
     - name: Add sample data to MySQL database
-      run: mysql --user=root --password=root --host 127.0.0.1 < src/main/resources/sample-data.sql
+      run: mysql --user=root --password=${{ secrets.MY_SQL_PASSWORD }} --host 127.0.0.1 < src/main/resources/sample-data.sql
     - name: Create MySQL admin user to access database
       env:
-        LESSON9_USER: ${{ secrets.LESSON9_USER }}
-        LESSON9_PASSWORD: ${{ secrets.LESSON9_PASSWORD }}
-      run: mysql --user=root --password=root --host 127.0.0.1 <<< "CREATE USER '$LESSON9_USER'@'localhost' IDENTIFIED BY '$LESSON9_PASSWORD'; GRANT ALL PRIVILEGES ON lesson9.* TO '$LESSON9_USER'@'localhost';"
+        LESSON9_USER: root
+        LESSON9_PASSWORD: ${{ secrets.MY_SQL_PASSWORD }}
+      run: mysql --user=root --password=${{ secrets.MY_SQL_PASSWORD }}} --host 127.0.0.1 <<< "CREATE USER '$LESSON9_USER'@'localhost' IDENTIFIED BY '$LESSON9_PASSWORD'; GRANT ALL PRIVILEGES ON lesson9.* TO '$LESSON9_USER'@'localhost';"
     - name: Build with Maven
       env:
-        LESSON9_USER: ${{ secrets.LESSON9_USER }}
-        LESSON9_PASSWORD: ${{ secrets.LESSON9_PASSWORD }}
+        LESSON9_USER: root
+        LESSON9_PASSWORD: ${{ secrets.MY_SQL_PASSWORD }}
       run: mvn -B package -D maven.test.skip
     - name: Test with Maven
       env:
-        LESSON9_USER: ${{ secrets.LESSON9_USER }}
-        LESSON9_PASSWORD: ${{ secrets.LESSON9_PASSWORD }}
+        LESSON9_USER: root
+        LESSON9_PASSWORD: ${{ secrets.MY_SQL_PASSWORD }}
       run: mvn -B test
     - name: Run with Docker
       env:
-        MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-        LESSON9_USER: ${{ secrets.LESSON9_USER }}
-        LESSON9_PASSWORD: ${{ secrets.LESSON9_PASSWORD }}
+        MYSQL_ROOT_PASSWORD: ${{ secrets.MY_SQL_PASSWORD }}
+        LESSON9_USER: root
+        LESSON9_PASSWORD: ${{ secrets.MY_SQL_PASSWORD }}
       run: docker compose up --build --detach
     - name: Check container health
       run: |
